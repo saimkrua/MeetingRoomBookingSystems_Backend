@@ -1,0 +1,88 @@
+const MeetingRoom = require('../model/meetingRoom');
+const Booking = require('../model/booking');
+
+// Get all available meeting rooms
+exports.getAvailableRoom = async (req, res) => {
+    try {
+        const { startTime, endTime } = req.query;
+        const availableRooms = await MeetingRoom.find({
+        $nor: [{
+                bookings: {
+                    $elemMatch: {
+                    $and: [
+                        { startTime: { $lte: endTime } },
+                        { endTime: { $gte: startTime } }
+                    ]
+                    }
+                }}
+            ]
+        });
+    res.json(availableRooms);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Create a new booking
+exports.createNewBooking = async (req, res) => {
+    
+    const { roomId, startTime, endTime, bookedBy } = req.body;
+
+    try {
+        // Check if the meeting room exists
+        const meetingRoom = await MeetingRoom.findById(roomId);
+        if (!meetingRoom) {
+            return res.status(404).json({ message: 'Meeting room not found' });
+        }
+
+        // Check if the room is already booked during the requested time
+        const overlappingBooking = meetingRoom.bookings.find(booking =>
+            (booking.startTime <= startTime && startTime <= booking.endTime) ||
+            (booking.startTime <= endTime && endTime <= booking.endTime)
+        );
+        if (overlappingBooking) {
+            return res.status(400).json({ message: 'The room is already booked during the requested time' });
+        }
+
+        // Create a new booking
+        const booking = new Booking({
+            roomId,
+            startTime,
+            endTime,
+            bookedBy
+        });
+
+        // Save the booking
+        const newBooking = await booking.save();
+        
+        // Add the booking to the meeting room's bookings array
+        meetingRoom.bookings.push(newBooking);
+        await meetingRoom.save();
+
+        res.status(201).json(newBooking);
+        } catch (error) {
+        res.status(500).json({ message: error.message });
+        }
+};
+
+// Cancel a booking
+exports.cancelBooking = async (req, res) => {
+
+    try {
+        const booking = await Booking.findById(req.params.bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+        await Booking.findByIdAndDelete(req.params.bookingId);
+    
+        await MeetingRoom.updateOne(
+            { _id: booking.roomId },
+            { $pull: { bookings: { _id: booking._id } } }
+        );          
+
+        res.json({ message: 'Booking canceled successfully'});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
