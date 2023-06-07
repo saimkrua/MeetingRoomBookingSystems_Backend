@@ -36,10 +36,19 @@ exports.createNewBooking = async (req, res) => {
         }
 
         // Check if the room is already booked during the requested time
-        const overlappingBooking = meetingRoom.bookings.find(booking =>
-            (booking.startTime <= startTime && startTime <= booking.endTime) ||
-            (booking.startTime <= endTime && endTime <= booking.endTime)
-        );
+        const overlappingBooking = await Booking.findOne({
+            roomId,
+                $or: [
+                {
+                    startTime: { $lte: startTime },
+                    endTime: { $gte: startTime }
+                },
+                {
+                    startTime: { $lte: endTime },
+                    endTime: { $gte: endTime }
+                }
+                ]
+            });
         if (overlappingBooking) {
             return res.status(400).json({ message: 'The room is already booked during the requested time' });
         }
