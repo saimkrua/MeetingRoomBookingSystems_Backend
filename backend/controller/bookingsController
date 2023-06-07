@@ -10,8 +10,8 @@ exports.getAvailableRoom = async (req, res) => {
                 bookings: {
                     $elemMatch: {
                     $and: [
-                        { startTime: { $lte: endTime } },
-                        { endTime: { $gte: startTime } }
+                        { startTime: { $lt: endTime } },
+                        { endTime: { $gt: startTime } }
                     ]
                     }
                 }}
