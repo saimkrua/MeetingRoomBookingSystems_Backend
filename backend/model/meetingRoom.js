@@ -14,6 +14,6 @@ const meetingRoomSchema = new Schema({
     }],
 });
 
-const MeetingRoom = mongoose.model('meetingRoom', meetingRoomSchema);
+const MeetingRoom = mongoose.model('MeetingRoom', meetingRoomSchema);
 
 module.exports = MeetingRoom;

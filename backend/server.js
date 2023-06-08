@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 
 process.on("uncaughtException", (err) => {
   console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
@@ -7,12 +7,6 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-dotenv.config({ path: "./config.env" });
-const app = require("./app");
-
-const port = 3000;
-const server = app.listen(port, () => {});
-
 process.on("unhandledRejection", (err) => {
   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
   console.log(err.name, err.message);
@@ -20,3 +14,8 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
   });
 });
+
+const app = require("./app");
+const server = app.listen(process.env.PORT, () => {});
+
+
