@@ -1,11 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const session = require("express-session");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+
+// const cors = require("cors");
+// const session = require("express-session");
 
 const AppError = require("./utils/appError");
 const userRoutes = require("./routes/userRoutes");
@@ -14,20 +12,20 @@ const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
-const sessionOptions = {
-  secret: "my-secret",
-  resave: true,
-  saveUninitialized: true,
-  cookie: {
-    // setting this false for http connections
-    secure: false,
-  },
-};
+// const sessionOptions = {
+//   secret: "my-secret",
+//   resave: true,
+//   saveUninitialized: true,
+//   cookie: {
+//     // setting this false for http connections
+//     secure: false,
+//   },
+// };
 
-const corsOptions = {
-  origin: true,
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: true,
+//   credentials: true,
+// };
 
 mongoose.connect('mongodb://127.0.0.1:27017/meetingRoomVonder', {
   useNewUrlParser: true,
@@ -36,9 +34,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/meetingRoomVonder', {
 .then(() => console.log('Connected to MongoDB'))
 .catch((error) => console.error('Error connecting to MongoDB:', error));
 
-app.use(express.static("static"));
-app.use(cors(corsOptions));
-app.use(session(sessionOptions));
+// app.use(express.static("static"));
+// app.use(cors(corsOptions));
+// app.use(session(sessionOptions));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
