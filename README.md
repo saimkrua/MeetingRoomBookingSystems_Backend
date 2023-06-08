@@ -20,8 +20,8 @@ VonderMeetingRoomBookingSystems
 
 ### booking API
 
-| Method  | URL	                    | Description                                                       |
-| ------- | ----------------------- | ----------------------------------------------------------------- |
-| GET     | `/booking/available`    | Get available rooms by querying with startTime and endTime        |
-| POST    | `/booking`              | Create a new booking with roomId, startTime, endTime, and userID  |
-| DELETE  | `/booking/:bookingId`   | Cancel a booking using the bookingId                              |
+| Method  | URL	                    | Description                                                                 |
+| ------- | ----------------------- | --------------------------------------------------------------------------- |
+| GET     | `/booking/available`    | Get available rooms by querying with startTime and endTime                  |
+| POST    | `/booking`              | Create a new booking with roomId, startTime, endTime, and bookedBy(userID)  |
+| DELETE  | `/booking/:bookingId`   | Cancel a booking using the bookingId                                        |
