@@ -15,9 +15,9 @@ describe('User API', () => {
         // Create a sample user
         const hashedPassword = await bcrypt.hash('password123', 10);
         const user = new User({
-        username: 'testuser',
-        email: 'testuser@example.com',
-        password: hashedPassword,
+            username: 'testuser',
+            email: 'testuser@example.com',
+            password: hashedPassword,
         });
         await user.save();
 
@@ -93,13 +93,13 @@ describe('User API', () => {
 
         it('should return 401 status if invalid username or password', async () => {
             const credentials = {
-                username: 'testuser', 
+                username: 'testuser',
                 password: 'incorrectpassword', // Use incorrect password
             };
             const response = await request(app).post('/user/signin').send(credentials);
             expect(response.status).toBe(401);
             expect(response.body).toHaveProperty('message', 'Invalid username or password');
         });
-        
+
     });
 });

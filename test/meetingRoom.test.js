@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../app'); 
+const app = require('../app');
 const mongoose = require('mongoose');
 const MeetingRoom = require('../model/meetingRoom');
 
@@ -27,6 +27,7 @@ describe('Meeting Room API', () => {
         await nonExistMeetingRoom.save();
         nonExistRoomId = nonExistMeetingRoom._id;
         await MeetingRoom.deleteOne({ _id: nonExistRoomId });
+        
     });
 
 
@@ -73,8 +74,8 @@ describe('Meeting Room API', () => {
             const response = await request(app).get(`/meetingRoom/${testMeetingRoom._id}`);
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('_id', testMeetingRoom._id.toString());
-            expect(response.body).toHaveProperty('name');
-            expect(response.body).toHaveProperty('capacity');
+            expect(response.body).toHaveProperty('name',testMeetingRoom.name );
+            expect(response.body).toHaveProperty('capacity', testMeetingRoom.capacity);
         });
 
         it('should return 404 if the meeting room does not exist', async () => {
