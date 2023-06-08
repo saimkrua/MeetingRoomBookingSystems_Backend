@@ -7,58 +7,38 @@ const SECRET_KEY = process.env.SECRET_KEY
 // signUp a new user
 exports.signUpNewUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
-    
-        // Check if the user already exists
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(409).json({ message: 'User already exists' });
-        }
-    
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-    
-        // Create a new user
-        const newUser = new User({
-            username,
-            email,
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const user = await User.create({
+            username: req.body.username,
+            email: req.body.email,
             password: hashedPassword
         });
-    
-        // Save the user to the database
-        await newUser.save();
-    
-        // Generate a JWT token
-        const token = jwt.sign({ userId: newUser._id }, SECRET_KEY);
-    
+        const token = jwt.sign({ userId: user._id }, SECRET_KEY);
         res.status(201).json({ message: 'User registered successfully', token });
-        } catch (error) {
-        res.status(500).json({ message: error.message });
+    } 
+    catch (error) {
+        if (error.code === 11000 && error.keyPattern) {
+            if (error.keyPattern.email) {res.status(409).json({ message: 'Email already exists' });
+            } else if (error.keyPattern.username) {res.status(409).json({ message: 'Username already exists' });
+            } else {res.status(409).json({ message: 'Duplicate field already exists' });}
+        } else {res.status(500).json({ message: error.message });}
     }
 };
 
 //signIn User
 exports.signInUser = async (req, res) => {
     try {
-        const { username, password } = req.body;
-    
-        // Check if the user exists
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username: req.body.username });
         if (!user) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
-    
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
-    
-        // Generate a JWT token
         const token = jwt.sign({ userId: user._id }, SECRET_KEY);
-    
         res.json({ message: 'Sign-in successful', token });
-        } catch (error) {
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
